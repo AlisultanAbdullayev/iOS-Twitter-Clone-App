@@ -9,11 +9,15 @@ import SwiftUI
 
 struct TweetRowView: View {
     
-    let tweet: Tweet
+    @ObservedObject private var tweetRowViewModel: TweetRowViewModel
+    
+    init(tweet: Tweet) {
+        tweetRowViewModel = TweetRowViewModel(tweet: tweet)
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let user = tweet.user {
+            if let user = tweetRowViewModel.tweet.user {
                 // MARK: Profile Image + User Info + Tweet
                 HStack(alignment: .top, spacing: 12.0) {
                     AsyncImage(url: URL(string: user.profileImageUrl),
@@ -30,7 +34,7 @@ struct TweetRowView: View {
                     // MARK: User Info & Tweet Caption
                     VStack(alignment: .leading, spacing: 4.0) {
                         // MARK: User Info
-                        if let user = tweet.user {
+                        if let user = tweetRowViewModel.tweet.user {
                             HStack {
                                 Text(user.fullName)
                                     .font(.subheadline)
@@ -38,13 +42,13 @@ struct TweetRowView: View {
                                 Text("@\(user.username)")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
-                                Text("\(tweet.timestamp.hashValue)")
+                                Text("\(tweetRowViewModel.tweet.timestamp.dateValue().formatted())")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
                         }
                         // MARK: Tweet Caption
-                        Text(tweet.caption)
+                        Text(tweetRowViewModel.tweet.caption)
                             .font(.subheadline)
                             .multilineTextAlignment(.leading)
                     }
@@ -64,9 +68,13 @@ struct TweetRowView: View {
                     }
                     Spacer()
                     Button {
-                        //
+                        tweetRowViewModel.tweet.didLike ?? false ?
+                        tweetRowViewModel.unlikeTweet() :
+                        tweetRowViewModel.likeTweet()
                     } label: {
-                        Image(systemName: "suit.heart")
+                        Image(systemName: tweetRowViewModel.tweet.didLike ?? false ? "heart.fill" : "suit.heart")
+                            .font(.subheadline)
+                            .foregroundColor(tweetRowViewModel.tweet.didLike ?? false ? .red : .none)
                     }
                     Spacer()
                     Button {

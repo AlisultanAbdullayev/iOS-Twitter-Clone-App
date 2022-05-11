@@ -11,12 +11,11 @@ import SwiftUI
 struct ProfileView: View {
     
     @State private var selectedFilter: TweetFilterViewModel = .tweets
+    @ObservedObject private var profileViewModel: ProfileViewModel
     @Namespace private var animation
-    private let user: User
-    @StateObject private var feedViewModel = FeedViewModel()
     
     init(user: User) {
-        self.user = user
+        profileViewModel = ProfileViewModel(user: user)
     }
     
     var body: some View {
@@ -31,7 +30,7 @@ struct ProfileView: View {
             }
         }
         .ignoresSafeArea()
-        .navigationTitle(user.fullName)
+        .navigationTitle(profileViewModel.user.fullName)
     }
 }
 
@@ -45,7 +44,7 @@ extension ProfileView {
     
     private var headerView: some View {
         ZStack(alignment: .bottomLeading) {
-            AsyncImage(url: URL(string: user.profileImageUrl)) { image in
+            AsyncImage(url: URL(string: profileViewModel.user.profileImageUrl)) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -57,7 +56,7 @@ extension ProfileView {
                     .padding()
                     .frame(width: UIScreen.main.bounds.width, height: 150, alignment: .bottom)
             }
-            AsyncImage(url: URL(string: user.profileImageUrl)) { image in
+            AsyncImage(url: URL(string: profileViewModel.user.profileImageUrl)) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -94,7 +93,7 @@ extension ProfileView {
             Button {
                 //
             } label: {
-                Text("Edit Profile")
+                Text(profileViewModel.actionButtonTitle)
                     .bold()
                     .frame(width: 120, height: 32)
                     .background(
@@ -110,13 +109,13 @@ extension ProfileView {
     private var infoDetails: some View {
         VStack(alignment: .leading, spacing: 5.0) {
             HStack {
-                Text(user.fullName)
+                Text(profileViewModel.user.fullName)
                     .font(.title2)
                     .bold()
                 Image(systemName: "checkmark.seal.fill")
                     .foregroundColor(.blue)
             }
-            Text("@\(user.username)")
+            Text("@\(profileViewModel.user.username)")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             Text("Senior iOS Developer")
@@ -174,7 +173,7 @@ extension ProfileView {
     
     private var tweetsView: some View {
         LazyVStack {
-            ForEach(feedViewModel.tweets) { tweet in
+            ForEach(profileViewModel.tweets(filter: selectedFilter)) { tweet in
                 TweetRowView(tweet: tweet)
                 Divider()
             }

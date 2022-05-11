@@ -25,6 +25,11 @@ struct FeedView: View {
             }
             floatingButton
         }
+        .onAppear {
+            feedViewModel.fetchTweets()
+        }
+        .navigationBarTitle("Feed")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

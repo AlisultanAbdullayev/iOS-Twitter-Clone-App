@@ -15,6 +15,7 @@ struct NewTweetView: View {
     @State private var placeholder: String = "What's happening...?"
     @EnvironmentObject private var authViewModel: AuthViewModel
     @StateObject private var uploadTweetViewModel = UploadTweetViewModel()
+    @StateObject private var feedViewModel = FeedViewModel()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
